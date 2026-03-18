@@ -126,7 +126,7 @@ class Scanner {
                     addToken(OR);
                 }
                 break;
-            default:
+            default: // multi character string like "123" or "var"
                 if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
@@ -138,11 +138,11 @@ class Scanner {
         }
     }
 
-    private void identifier() {
+    private void identifier() { // for keywords like "var"
         while (isAlphaNumeric(peek())) {
             advance();
         }
-        String text = source.substring(start, current);
+        String text = source.substring(start, current); // current is now at the end of the word
         TokenType type = keywords.get(text);
         if (type == null) {
             type = IDENTIFIER;
@@ -179,8 +179,7 @@ class Scanner {
             }
         }
 
-        addToken(NUMBER,
-                Double.parseDouble(source.substring(start, current)));
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
     private char peekNext() {
@@ -230,7 +229,7 @@ class Scanner {
         addToken(STRING, value);
     }
 
-    private char advance() {
+    private char advance() { // each call pushes current forward as a side-effect
         return source.charAt(current++);
     }
 
