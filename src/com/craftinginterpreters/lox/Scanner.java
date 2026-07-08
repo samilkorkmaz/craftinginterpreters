@@ -121,11 +121,11 @@ class Scanner {
             case '"':
                 string();
                 break;
-            case 'o':
+            /*case 'o': // This is a bug because it incorrectly tokenizes identifiers starting with or (e.g., orange, orbit, order). Removing it allows the existing identifier() logic to correctly recognize both identifiers and the or keyword.
                 if (match('r')) {
                     addToken(OR);
                 }
-                break;
+                break;*/
             default: // multi character string like "123" or "var"
                 if (isDigit(c)) {
                     number();
