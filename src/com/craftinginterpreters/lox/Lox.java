@@ -60,6 +60,8 @@ public class Lox {
         tokens.forEach((token) -> {
             System.out.println(token);
         });
+        
+        System.out.println("Running total: " + scanner.getRunningTotal());
     }
 
     static void error(int line, String message) {

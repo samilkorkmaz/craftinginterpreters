@@ -38,6 +38,9 @@ class ScannerSimple {
     private int current = 0;
     private int line = 1;
 
+    private double runningTotal = 0.0;
+    private TokenType activeOp = PLUS; // Keeps track of the last seen operator (default to PLUS)
+
     ScannerSimple(String source) {
         this.source = source;
     }
@@ -61,9 +64,11 @@ class ScannerSimple {
                 addToken(RIGHT_PAREN);
                 break;
             case '+':
+                activeOp = PLUS;
                 addToken(PLUS);
                 break;
             case '-':
+                activeOp = MINUS;
                 addToken(MINUS);
                 break;
             case '*':
@@ -82,11 +87,23 @@ class ScannerSimple {
             default: // multi character string like "123"
                 if (isDigit(c)) {
                     number();
+                    double value = (Double) tokens.get(tokens.size() - 1).literal;
+                    // Whenever the token is a number, perform the computation on the fly
+                    if (activeOp == PLUS) {
+                        runningTotal += value;
+                    } else if (activeOp == MINUS) {
+                        runningTotal -= value;
+                    }
+                    //System.out.println("Last value: " + value + ", activeOp: " + activeOp + ", current result: " + result);
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
                 break;
         }
+    }
+
+    public double getRunningTotal() {
+        return runningTotal;
     }
 
     private void number() {
