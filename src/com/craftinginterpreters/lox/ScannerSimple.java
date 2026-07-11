@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.craftinginterpreters.lox.TokenType.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /*
  * Compared to Scanner.java: *
@@ -40,6 +42,9 @@ class ScannerSimple {
 
     private double runningTotal = 0.0;
     private TokenType activeOp = PLUS; // Keeps track of the last seen operator (default to PLUS)
+    // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
+    Deque<Double> operandStack = new ArrayDeque<>();
+    Deque<TokenType> operatorStack = new ArrayDeque<>();
 
     ScannerSimple(String source) {
         this.source = source;
@@ -72,9 +77,11 @@ class ScannerSimple {
                 addToken(MINUS);
                 break;
             case '*':
+                activeOp = STAR;
                 addToken(STAR);
                 break;
             case '/':
+                activeOp = SLASH;
                 addToken(SLASH);
                 break;
             case ' ':
@@ -88,13 +95,26 @@ class ScannerSimple {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
-                    // Whenever the token is a number, perform the computation on the fly
-                    if (activeOp == PLUS) {
-                        runningTotal += value;
-                    } else if (activeOp == MINUS) {
-                        runningTotal -= value;
+                    if (null != activeOp) // Whenever the token is a number, perform the computation on the fly
+                    {
+                        switch (activeOp) {
+                            case PLUS:
+                                runningTotal += value;
+                                break;
+                            //System.out.println("Last value: " + value + ", activeOp: " + activeOp + ", current result: " + result);
+                            case MINUS:
+                                runningTotal -= value;
+                                break;
+                            case STAR:
+                                runningTotal *= value;
+                                break;
+                            case SLASH:
+                                runningTotal /= value;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                    //System.out.println("Last value: " + value + ", activeOp: " + activeOp + ", current result: " + result);
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
