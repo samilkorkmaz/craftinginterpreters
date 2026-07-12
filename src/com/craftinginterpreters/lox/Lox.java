@@ -54,14 +54,14 @@ public class Lox {
     private static void run(String source) {
         //Scanner scanner = new Scanner(source);
         ScannerSimple scanner = new ScannerSimple(source);
-        List<Token> tokens = scanner.scanTokens();
+        List<Token> tokens = scanner.getTokens();
 
         // For now, just print the tokens.
         tokens.forEach((token) -> {
             System.out.println(token);
         });
         
-        System.out.println("Running total: " + scanner.getRunningTotal());
+        System.out.println("Result of " + source + ": " + scanner.calculateResult());
     }
 
     static void error(int line, String message) {

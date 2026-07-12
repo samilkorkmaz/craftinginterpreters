@@ -40,22 +40,21 @@ class ScannerSimple {
     private int current = 0;
     private int line = 1;
 
-    private double runningTotal = 0.0;
     private TokenType activeOp = PLUS; // Keeps track of the last seen operator (default to PLUS)
     // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
-    Deque<Double> operandStack = new ArrayDeque<>();
+    Deque<Double> numberStack = new ArrayDeque<>();
     Deque<TokenType> operatorStack = new ArrayDeque<>();
 
     ScannerSimple(String source) {
         this.source = source;
-    }
-
-    List<Token> scanTokens() {
         while (!isAtEnd()) {
             start = current;
             scanToken();
         }
         tokens.add(new Token(EOF, "", null, line));
+    }
+
+    public List<Token> getTokens() {
         return tokens;
     }
 
@@ -70,19 +69,23 @@ class ScannerSimple {
                 break;
             case '+':
                 activeOp = PLUS;
-                addToken(PLUS);
+                operatorStack.push(activeOp);
+                addToken(activeOp);
                 break;
             case '-':
                 activeOp = MINUS;
-                addToken(MINUS);
+                operatorStack.push(activeOp);
+                addToken(activeOp);
                 break;
             case '*':
                 activeOp = STAR;
-                addToken(STAR);
+                operatorStack.push(activeOp);
+                addToken(activeOp);
                 break;
             case '/':
                 activeOp = SLASH;
-                addToken(SLASH);
+                operatorStack.push(activeOp);
+                addToken(activeOp);
                 break;
             case ' ':
             case '\r':
@@ -95,26 +98,15 @@ class ScannerSimple {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
-                    if (null != activeOp) // Whenever the token is a number, perform the computation on the fly
-                    {
-                        switch (activeOp) {
-                            case PLUS:
-                                runningTotal += value;
-                                break;
-                            //System.out.println("Last value: " + value + ", activeOp: " + activeOp + ", current result: " + result);
-                            case MINUS:
-                                runningTotal -= value;
-                                break;
-                            case STAR:
-                                runningTotal *= value;
-                                break;
-                            case SLASH:
-                                runningTotal /= value;
-                                break;
-                            default:
-                                break;
-                        }
+                    if (operatorStack.peek() == STAR) {
+                        operatorStack.pop();
+                        value *= numberStack.pop(); // Since multiplication has higher precedence than +-, apply it to the two numbers and remove multiplication from the operatorStack
+                    } else if (operatorStack.peek() == SLASH) {
+                        operatorStack.pop();
+                        value = numberStack.pop() / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
                     }
+                    numberStack.push(value);
+
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
@@ -122,15 +114,33 @@ class ScannerSimple {
         }
     }
 
-    public double getRunningTotal() {
-        return runningTotal;
+    public double calculateResult() {
+        // Numbers and operators are pushed in left-to-right order, but Stack.pop() is LIFO. Reverse stacks so you can consume them in original operation order:
+        Deque<Double> numbers = new ArrayDeque<>();
+        Deque<TokenType> operators = new ArrayDeque<>();
+        while (!numberStack.isEmpty()) {
+            numbers.push(numberStack.pop());
+        }
+        while (!operatorStack.isEmpty()) {
+            operators.push(operatorStack.pop());
+        }
+        double result = numbers.pop();
+        while (!operators.isEmpty()) {
+            TokenType operator = operators.pop();
+            double val = numbers.pop();
+            if (operator == PLUS) {
+                result += val;
+            } else if (operator == MINUS) {
+                result -= val;
+            }
+        }
+        return result;
     }
 
     private void number() {
         while (isDigit(peek())) {
             advance();
         }
-
         // Look for a fractional part.
         if (peek() == '.' && isDigit(peekNext())) {
             advance(); // consume the "."
@@ -138,7 +148,6 @@ class ScannerSimple {
                 advance();
             }
         }
-
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
