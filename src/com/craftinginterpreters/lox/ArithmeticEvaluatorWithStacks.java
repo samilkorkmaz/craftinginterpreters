@@ -8,31 +8,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /*
- * Compared to Scanner.java: *
- * - No keywords map or identifier() — letters are an error *
- * - No string scanning 
- * - No // comment handling 
- * - No two-character tokens (!=, ==, etc.) *
- * For "(1 + 3) * 123 / (5-1) - 120" it would produce: 
- * LEFT_PAREN ( null 
- * NUMBER 1 1.0 
- * PLUS + null 
- * NUMBER 3 3.0 
- * RIGHT_PAREN ) null 
- * STAR * null 
- * NUMBER 123 123.0 
- * SLASH / null
- * LEFT_PAREN ( null 
- * NUMBER 5 5.0 
- * MINUS - null 
- * NUMBER 1 1.0 
- * RIGHT_PAREN ) null 
- * MINUS - null 
- * NUMBER 120 120.0 
- * EOF null *
- * @author OEM
+ * @author skorkmaz
+ * @date July 2026
  */
-class ScannerSimple {
+class ArithmeticEvaluatorWithStacks {
 
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -40,12 +19,11 @@ class ScannerSimple {
     private int current = 0;
     private int line = 1;
 
-    private TokenType activeOp = PLUS; // Keeps track of the last seen operator (default to PLUS)
     // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
     Deque<Double> numberStack = new ArrayDeque<>();
     Deque<TokenType> operatorStack = new ArrayDeque<>();
 
-    ScannerSimple(String source) {
+    ArithmeticEvaluatorWithStacks(String source) {
         this.source = source;
         while (!isAtEnd()) {
             start = current;
@@ -60,6 +38,7 @@ class ScannerSimple {
 
     private void scanToken() {
         char c = advance();
+        TokenType activeOp;
         switch (c) {
             case '(':
                 addToken(LEFT_PAREN);
