@@ -20,8 +20,9 @@ class ArithmeticEvaluatorWithStacks {
     private int line = 1;
 
     // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
-    Deque<Double> numberStack = new ArrayDeque<>();    
+    Deque<Double> numberStack = new ArrayDeque<>();
     TokenType activeOp;
+    TokenType prevOp;
 
     ArithmeticEvaluatorWithStacks(String source) {
         this.source = source;
@@ -37,9 +38,14 @@ class ArithmeticEvaluatorWithStacks {
     }
 
     private void scanToken() {
-        char c = advance();        
-        switch (c) {            
+        char c = advance();
+        switch (c) {
+            case '+':
+                activeOp = PLUS;
+                addToken(activeOp);
+                break;
             case '-':
+                prevOp = activeOp; // To record if there was a * or / operation before sign operation
                 activeOp = MINUS;
                 addToken(activeOp);
                 break;
@@ -72,11 +78,17 @@ class ArithmeticEvaluatorWithStacks {
                                 break;
                             case MINUS:
                                 value = -value;
+                                if (prevOp == STAR) {
+                                    value *= numberStack.pop();
+                                } else if (prevOp == SLASH) {
+                                    value = numberStack.pop() / value;
+                                }
                                 break;
                             default:
                                 break;
                         }
                     }
+                    activeOp = null;
                     numberStack.push(value); // push number with its sign
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
