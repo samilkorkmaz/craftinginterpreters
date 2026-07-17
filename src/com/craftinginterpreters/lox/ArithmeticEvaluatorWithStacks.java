@@ -77,14 +77,25 @@ class ArithmeticEvaluatorWithStacks {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
-                    if (operatorStack.peek() == STAR) {
-                        operatorStack.pop();
-                        value *= numberStack.pop(); // Since multiplication has higher precedence than +-, apply it to the two numbers and remove multiplication from the operatorStack
-                    } else if (operatorStack.peek() == SLASH) {
-                        operatorStack.pop();
-                        value = numberStack.pop() / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
+                    if (null != operatorStack.peek()) {
+                        switch (operatorStack.peek()) { // check operator before number
+                            case STAR:
+                                operatorStack.pop();
+                                value *= numberStack.pop(); // Since multiplication has higher precedence than +-, apply it to the two numbers and remove multiplication from the operatorStack
+                                break;
+                            case SLASH:
+                                operatorStack.pop();
+                                value = numberStack.pop() / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
+                                break;
+                            case MINUS:
+                                operatorStack.pop();
+                                value = -value;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                    numberStack.push(value);
+                    numberStack.push(value); // push number with its sign
 
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
@@ -94,24 +105,9 @@ class ArithmeticEvaluatorWithStacks {
     }
 
     public double calculateResult() {
-        // Numbers and operators are pushed in left-to-right order, but Stack.pop() is LIFO. Reverse stacks so you can consume them in original operation order:
-        Deque<Double> numbers = new ArrayDeque<>();
-        Deque<TokenType> operators = new ArrayDeque<>();
+        double result = numberStack.pop();
         while (!numberStack.isEmpty()) {
-            numbers.push(numberStack.pop());
-        }
-        while (!operatorStack.isEmpty()) {
-            operators.push(operatorStack.pop());
-        }
-        double result = numbers.pop();
-        while (!operators.isEmpty()) {
-            TokenType operator = operators.pop();
-            double val = numbers.pop();
-            if (operator == PLUS) {
-                result += val;
-            } else if (operator == MINUS) {
-                result -= val;
-            }
+            result += numberStack.pop(); // Since * and / operations are done during scanToken phase and all numbers contain their sign, we can sum them up
         }
         return result;
     }

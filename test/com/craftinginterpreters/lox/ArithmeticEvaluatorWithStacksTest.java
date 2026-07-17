@@ -160,4 +160,10 @@ public class ArithmeticEvaluatorWithStacksTest {
         ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks("10 / 4 / 2");
         assertEquals(1.25, scanner.calculateResult(), 1e-15); // (10/4)/2 = 1.25
     }
+
+    @Test
+    public void testFirstNumberNegative() {
+        ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks("-30 + 20");
+        assertEquals(-10, scanner.calculateResult(), 1e-15); // -30 + 20 = -10
+    }
 }
