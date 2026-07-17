@@ -173,4 +173,10 @@ public class ArithmeticEvaluatorWithStacksTest {
         assertEquals(-6, scanner.calculateResult(), 1e-15); // 3 * -2 = -6
     }   
     
+    @Test
+    public void testMultiplyTwoNegativeNumbers() {
+        ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks("-3 * -2");
+        assertEquals(6, scanner.calculateResult(), 1e-15); // 3 * -2 = -6
+    }   
+    
 }
