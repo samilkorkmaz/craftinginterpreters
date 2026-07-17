@@ -58,7 +58,7 @@ class ArithmeticEvaluatorWithStacks {
             case '\n':
                 line++;
                 break;
-            default: // multi character string like "123"
+            default: // multi character string like "123.45"
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
@@ -78,7 +78,6 @@ class ArithmeticEvaluatorWithStacks {
                         }
                     }
                     numberStack.push(value); // push number with its sign
-
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
