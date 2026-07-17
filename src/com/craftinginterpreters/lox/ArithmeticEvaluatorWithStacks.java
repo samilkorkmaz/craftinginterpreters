@@ -20,8 +20,8 @@ class ArithmeticEvaluatorWithStacks {
     private int line = 1;
 
     // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
-    Deque<Double> numberStack = new ArrayDeque<>();
-    Deque<TokenType> operatorStack = new ArrayDeque<>();
+    Deque<Double> numberStack = new ArrayDeque<>();    
+    TokenType activeOp;
 
     ArithmeticEvaluatorWithStacks(String source) {
         this.source = source;
@@ -37,33 +37,18 @@ class ArithmeticEvaluatorWithStacks {
     }
 
     private void scanToken() {
-        char c = advance();
-        TokenType activeOp;
-        switch (c) {
-            case '(':
-                addToken(LEFT_PAREN);
-                break;
-            case ')':
-                addToken(RIGHT_PAREN);
-                break;
-            case '+':
-                activeOp = PLUS;
-                operatorStack.push(activeOp);
-                addToken(activeOp);
-                break;
+        char c = advance();        
+        switch (c) {            
             case '-':
                 activeOp = MINUS;
-                operatorStack.push(activeOp);
                 addToken(activeOp);
                 break;
             case '*':
                 activeOp = STAR;
-                operatorStack.push(activeOp);
                 addToken(activeOp);
                 break;
             case '/':
                 activeOp = SLASH;
-                operatorStack.push(activeOp);
                 addToken(activeOp);
                 break;
             case ' ':
@@ -77,18 +62,15 @@ class ArithmeticEvaluatorWithStacks {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
-                    if (null != operatorStack.peek()) {
-                        switch (operatorStack.peek()) { // check operator before number
+                    if (null != activeOp) {
+                        switch (activeOp) { // check operator before number
                             case STAR:
-                                operatorStack.pop();
                                 value *= numberStack.pop(); // Since multiplication has higher precedence than +-, apply it to the two numbers and remove multiplication from the operatorStack
                                 break;
                             case SLASH:
-                                operatorStack.pop();
                                 value = numberStack.pop() / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
                                 break;
                             case MINUS:
-                                operatorStack.pop();
                                 value = -value;
                                 break;
                             default:

@@ -166,4 +166,11 @@ public class ArithmeticEvaluatorWithStacksTest {
         ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks("-30 + 20");
         assertEquals(-10, scanner.calculateResult(), 1e-15); // -30 + 20 = -10
     }
+    
+    @Test
+    public void testMultiplyWithNegativeNumber() {
+        ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks("3 * -2");
+        assertEquals(-6, scanner.calculateResult(), 1e-15); // 3 * -2 = -6
+    }   
+    
 }
