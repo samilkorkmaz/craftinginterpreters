@@ -94,7 +94,7 @@ class ArithmeticEvaluator {
                         }
                     }
                     activeOp = null;
-                    if (continuesTerm) {
+                    if (continuesTerm) { // this number is finishing the same term as lastValue → overwrite lastValue in place, nothing goes to runningTotal yet.
                         lastValue = value; // replace the "top of stack" in place
                     } else {
                         if (hasTerm) {
