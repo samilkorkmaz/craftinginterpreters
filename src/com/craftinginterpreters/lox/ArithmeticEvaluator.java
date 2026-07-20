@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.craftinginterpreters.lox.TokenType.*;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /*
  * @author skorkmaz
  * @date July 2026
  */
-class ArithmeticEvaluatorWithStacks {
+class ArithmeticEvaluator {
 
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -19,12 +17,13 @@ class ArithmeticEvaluatorWithStacks {
     private int current = 0;
     private int line = 1;
 
-    // Stacks to handle arithmetic operator precedence, i.e. 3 + 5 * 2 = 13, not 16
-    Deque<Double> numberStack = new ArrayDeque<>();
+    private double runningTotal = 0.0;
+    private double lastValue = 0.0;
+    private boolean hasTerm = false; // guards the very first push
     TokenType activeOp;
     TokenType prevOp;
 
-    ArithmeticEvaluatorWithStacks(String source) {
+    ArithmeticEvaluator(String source) {
         this.source = source;
         while (!isAtEnd()) {
             start = current;
@@ -68,20 +67,26 @@ class ArithmeticEvaluatorWithStacks {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
+                    boolean continuesTerm = false; // does this number extend lastValue, or start a new term?
+
                     if (null != activeOp) {
                         switch (activeOp) { // check operator before number
                             case STAR:
-                                value *= numberStack.pop(); // Since multiplication has higher precedence than +-, apply it to the two numbers and remove multiplication from the operatorStack
+                                value = lastValue * value;
+                                continuesTerm = true;
                                 break;
                             case SLASH:
-                                value = numberStack.pop() / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
+                                value = lastValue / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
+                                continuesTerm = true;
                                 break;
                             case MINUS:
                                 value = -value;
                                 if (prevOp == STAR) {
-                                    value *= numberStack.pop();
+                                    value *= lastValue;
+                                    continuesTerm = true;
                                 } else if (prevOp == SLASH) {
-                                    value = numberStack.pop() / value;
+                                    value = lastValue / value;
+                                    continuesTerm = true;
                                 }
                                 break;
                             default:
@@ -89,7 +94,15 @@ class ArithmeticEvaluatorWithStacks {
                         }
                     }
                     activeOp = null;
-                    numberStack.push(value); // push number with its sign
+                    if (continuesTerm) {
+                        lastValue = value; // replace the "top of stack" in place
+                    } else {
+                        if (hasTerm) {
+                            runningTotal += lastValue; // flush the finished term
+                        }
+                        lastValue = value;
+                        hasTerm = true;
+                    }
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
@@ -97,12 +110,8 @@ class ArithmeticEvaluatorWithStacks {
         }
     }
 
-    public double calculateResult() {
-        double result = numberStack.pop();
-        while (!numberStack.isEmpty()) {
-            result += numberStack.pop(); // Since * and / operations are done during scanToken phase and all numbers contain their sign, we can sum them up
-        }
-        return result;
+    public double getResult() {
+        return runningTotal + lastValue; // flush whatever term is still pending;
     }
 
     private void number() {

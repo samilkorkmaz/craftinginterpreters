@@ -53,7 +53,7 @@ public class Lox {
 
     private static void run(String source) {
         //Scanner scanner = new Scanner(source);
-        ArithmeticEvaluatorWithStacks scanner = new ArithmeticEvaluatorWithStacks(source);
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator(source);
         List<Token> tokens = scanner.getTokens();
 
         // For now, just print the tokens.
@@ -61,7 +61,7 @@ public class Lox {
             System.out.println(token);
         });
         
-        System.out.println("Result of " + source + ": " + scanner.calculateResult());
+        System.out.println("Result of " + source + ": " + scanner.getResult());
     }
 
     static void error(int line, String message) {
