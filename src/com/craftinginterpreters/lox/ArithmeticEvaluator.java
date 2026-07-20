@@ -19,7 +19,6 @@ class ArithmeticEvaluator {
 
     private double runningTotal = 0.0;
     private double lastValue = 0.0;
-    private boolean hasTerm = false; // guards the very first push
     TokenType activeOp;
     TokenType prevOp;
 
@@ -97,11 +96,8 @@ class ArithmeticEvaluator {
                     if (continuesTerm) { // this number is finishing the same term as lastValue → overwrite lastValue in place, nothing goes to runningTotal yet.
                         lastValue = value; // replace the "top of stack" in place
                     } else {
-                        if (hasTerm) {
-                            runningTotal += lastValue; // flush the finished term
-                        }
+                        runningTotal += lastValue; // flush the finished term
                         lastValue = value;
-                        hasTerm = true;
                     }
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
