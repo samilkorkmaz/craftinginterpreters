@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 public class ArithmeticEvaluatorWithStacksTest {
 
     // ==========================================
-    // 1. Basic Precedence (Multiplication/Division first)
+    // Basic Precedence (Multiplication/Division first)
     // ==========================================
     @Test
     public void testCalculateResult1() {
@@ -33,7 +33,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 2. Left-to-Right Tie-Breakers (Equal Precedence)
+    // Left-to-Right Tie-Breakers (Equal Precedence)
     // ==========================================
     @Test
     public void testLeftToRightSubtraction() {
@@ -60,7 +60,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 3. Mixed Multi-Step Expressions
+    // Mixed Multi-Step Expressions
     // ==========================================
     @Test
     public void testMultiStepPrecedence() {
@@ -81,7 +81,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 4. Edge Cases (Decimals & Spaces)
+    // Edge Cases (Decimals & Spaces)
     // ==========================================
     @Test
     public void testDecimalHandling() {
@@ -96,7 +96,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 5. Deeper Left-to-Right Associativity (+ / -)
+    // Deeper Left-to-Right Associativity (+ / -)
     // ==========================================
     @Test
     public void testMixedPlusMinusChain() {
@@ -117,7 +117,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 6. Single Operand
+    // Single Operand
     // ==========================================
     @Test
     public void testSingleOperand() {
@@ -132,7 +132,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 7. Negative Results
+    // Negative Results
     // ==========================================
     @Test
     public void testNegativeResultSimple() {
@@ -147,7 +147,7 @@ public class ArithmeticEvaluatorWithStacksTest {
     }
 
     // ==========================================
-    // 8. Non-Integer Division Results
+    // Non-Integer Division Results
     // ==========================================
     @Test
     public void testFractionalDivisionResult() {
@@ -166,17 +166,80 @@ public class ArithmeticEvaluatorWithStacksTest {
         ArithmeticEvaluator scanner = new ArithmeticEvaluator("-30 + 20");
         assertEquals(-10, scanner.getResult(), 1e-15); // -30 + 20 = -10
     }
-    
+
     @Test
     public void testMultiplyWithNegativeNumber() {
         ArithmeticEvaluator scanner = new ArithmeticEvaluator("3 * -2");
         assertEquals(-6, scanner.getResult(), 1e-15); // 3 * -2 = -6
-    }   
-    
+    }
+
     @Test
     public void testMultiplyTwoNegativeNumbers() {
         ArithmeticEvaluator scanner = new ArithmeticEvaluator("-3 * -2");
         assertEquals(6, scanner.getResult(), 1e-15); // 3 * -2 = -6
-    }   
+    }
     
+    // ==========================================
+    // Parantheses
+    // ==========================================
+
+    @Test
+    public void testCalculateResultParens1() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("(3 + 5) * 2");
+        assertEquals(16.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens2() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("2 * (3 + 4)");
+        assertEquals(14.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens3() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("(10 - 4) / 3");
+        assertEquals(2.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens4() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("10 - (4 + 3)");
+        assertEquals(3.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens5() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("(2 + 3) * (4 - 1)");
+        assertEquals(15.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens6() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("3 * (4 + 2) / 2");
+        assertEquals(9.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens7() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("(6 / 2) + 4");
+        assertEquals(7.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens8() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("((2 + 3) * 4)");
+        assertEquals(20.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens9() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("2 * (3 * (4 + 1))");
+        assertEquals(30.0, scanner.getResult(), 1e-15);
+    }
+
+    @Test
+    public void testCalculateResultParens10() {
+        ArithmeticEvaluator scanner = new ArithmeticEvaluator("(1.5 + 2.5) * 2");
+        assertEquals(8.0, scanner.getResult(), 1e-15);
+    }
 }

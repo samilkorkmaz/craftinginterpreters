@@ -55,6 +55,30 @@ class ArithmeticEvaluator {
                 activeOp = SLASH;
                 addToken(activeOp);
                 break;
+            case '(': {
+                double saveTotal = runningTotal, saveLast = lastValue;
+                TokenType saveActive = activeOp, savePrev = prevOp;
+                runningTotal = 0.0;
+                lastValue = 0.0;
+                activeOp = null;
+                prevOp = null;
+
+                while (!isAtEnd() && peek() != ')') {
+                    start = current;
+                    scanToken();
+                }
+                double subResult = runningTotal + lastValue; // same as getResult()
+                if (!isAtEnd()) {
+                    advance(); // consume ')'
+                }
+                runningTotal = saveTotal;
+                lastValue = saveLast;
+                activeOp = saveActive;
+                prevOp = savePrev;
+
+                applyValue(subResult); // treat the parenthesized result like a number
+                break;
+            }
             case ' ':
             case '\r':
             case '\t':
@@ -66,44 +90,48 @@ class ArithmeticEvaluator {
                 if (isDigit(c)) {
                     number();
                     double value = (Double) tokens.get(tokens.size() - 1).literal;
-                    boolean continuesTerm = false; // does this number extend lastValue, or start a new term?
-
-                    if (null != activeOp) {
-                        switch (activeOp) { // check operator before number
-                            case STAR:
-                                value = lastValue * value;
-                                continuesTerm = true;
-                                break;
-                            case SLASH:
-                                value = lastValue / value; // Since division has higher precedence than +-, apply it to the two numbers and remove divisiob from the operatorStack
-                                continuesTerm = true;
-                                break;
-                            case MINUS:
-                                value = -value;
-                                if (prevOp == STAR) {
-                                    value *= lastValue;
-                                    continuesTerm = true;
-                                } else if (prevOp == SLASH) {
-                                    value = lastValue / value;
-                                    continuesTerm = true;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    activeOp = null;
-                    if (continuesTerm) { // this number is finishing the same term as lastValue → overwrite lastValue in place, nothing goes to runningTotal yet.
-                        lastValue = value; // replace the "top of stack" in place
-                    } else {
-                        runningTotal += lastValue; // flush the finished term
-                        lastValue = value;
-                    }
+                    applyValue(value);
                 } else {
                     Lox.error(line, "Unexpected character: '" + c + "'");
                 }
                 break;
         }
+    }
+
+    private double applyValue(double value) {
+        boolean continuesTerm = false;
+        if (activeOp != null) {
+            switch (activeOp) {
+                case STAR:
+                    value = lastValue * value;
+                    continuesTerm = true;
+                    break;
+                case SLASH:
+                    value = lastValue / value;
+                    continuesTerm = true;
+                    break;
+                case MINUS:
+                    value = -value;
+                    if (prevOp == STAR) {
+                        value *= lastValue;
+                        continuesTerm = true;
+                    } else if (prevOp == SLASH) {
+                        value = lastValue / value;
+                        continuesTerm = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        activeOp = null;
+        if (continuesTerm) {
+            lastValue = value;
+        } else {
+            runningTotal += lastValue;
+            lastValue = value;
+        }
+        return value;
     }
 
     public double getResult() {
