@@ -3,6 +3,7 @@ package com.craftinginterpreters.lox;
 import java.util.List;
 
 class Parser {
+
     private final List<Token> tokens;
     private int current = 0;
 
@@ -60,7 +61,10 @@ class Parser {
     // --- helpers ---
     private boolean match(TokenType... types) {
         for (TokenType t : types) {
-            if (check(t)) { advance(); return true; }
+            if (check(t)) {
+                advance();
+                return true;
+            }
         }
         return false;
     }
@@ -70,16 +74,28 @@ class Parser {
     }
 
     private Token advance() {
-        if (!isAtEnd()) current++;
+        if (!isAtEnd()) {
+            current++;
+        }
         return previous();
     }
 
-    private boolean isAtEnd() { return peek().type == TokenType.EOF; }
-    private Token peek() { return tokens.get(current); }
-    private Token previous() { return tokens.get(current - 1); }
+    private boolean isAtEnd() {
+        return peek().type == TokenType.EOF;
+    }
+
+    private Token peek() {
+        return tokens.get(current);
+    }
+
+    private Token previous() {
+        return tokens.get(current - 1);
+    }
 
     private Token consume(TokenType type, String message) {
-        if (check(type)) return advance();
+        if (check(type)) {
+            return advance();
+        }
         throw error(peek(), message);
     }
 
