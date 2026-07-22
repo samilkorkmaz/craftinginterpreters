@@ -67,7 +67,7 @@ class ArithmeticEvaluator {
                     start = current;
                     scanToken();
                 }
-                double subResult = runningTotal + lastValue; // same as getResult()
+                double subResult = runningTotal + lastValue; // result of expression in parenthesis
                 if (!isAtEnd()) {
                     advance(); // consume ')'
                 }
