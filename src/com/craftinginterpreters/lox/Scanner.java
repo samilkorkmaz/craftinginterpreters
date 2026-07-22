@@ -14,26 +14,26 @@ class Scanner {
     private int start = 0;
     private int current = 0;
     private int line = 1;
-    private static final Map<String, TokenType> keywords;
+    private static final Map<String, TokenType> KEYWORDS;
 
     static {
-        keywords = new HashMap<>();
-        keywords.put("and", AND);
-        keywords.put("class", CLASS);
-        keywords.put("else", ELSE);
-        keywords.put("false", FALSE);
-        keywords.put("for", FOR);
-        keywords.put("fun", FUN);
-        keywords.put("if", IF);
-        keywords.put("nil", NIL);
-        keywords.put("or", OR);
-        keywords.put("print", PRINT);
-        keywords.put("return", RETURN);
-        keywords.put("super", SUPER);
-        keywords.put("this", THIS);
-        keywords.put("true", TRUE);
-        keywords.put("var", VAR);
-        keywords.put("while", WHILE);
+        KEYWORDS = new HashMap<>();
+        KEYWORDS.put("and", AND);
+        KEYWORDS.put("class", CLASS);
+        KEYWORDS.put("else", ELSE);
+        KEYWORDS.put("false", FALSE);
+        KEYWORDS.put("for", FOR);
+        KEYWORDS.put("fun", FUN);
+        KEYWORDS.put("if", IF);
+        KEYWORDS.put("nil", NIL);
+        KEYWORDS.put("or", OR);
+        KEYWORDS.put("print", PRINT);
+        KEYWORDS.put("return", RETURN);
+        KEYWORDS.put("super", SUPER);
+        KEYWORDS.put("this", THIS);
+        KEYWORDS.put("true", TRUE);
+        KEYWORDS.put("var", VAR);
+        KEYWORDS.put("while", WHILE);
     }
 
     Scanner(String source) {
@@ -53,6 +53,10 @@ class Scanner {
 
     private boolean isAtEnd() {
         return current >= source.length();
+    }
+    
+    public List<Token> getTokens() {
+        return scanTokens();
     }
 
     private void scanToken() {
@@ -143,7 +147,7 @@ class Scanner {
             advance();
         }
         String text = source.substring(start, current); // current is now at the end of the word
-        TokenType type = keywords.get(text);
+        TokenType type = KEYWORDS.get(text);
         if (type == null) {
             type = IDENTIFIER;
         }

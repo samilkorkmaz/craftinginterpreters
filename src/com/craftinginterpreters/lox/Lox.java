@@ -52,16 +52,18 @@ public class Lox {
     }
 
     private static void run(String source) {
-        //Scanner scanner = new Scanner(source);
-        ArithmeticEvaluator scanner = new ArithmeticEvaluator(source);
+        Scanner scanner = new Scanner(source);        
+        //ArithmeticEvaluator scanner = new ArithmeticEvaluator(source);
         List<Token> tokens = scanner.getTokens();
+        Parser parser = new Parser(tokens);
 
         // For now, just print the tokens.
         tokens.forEach((token) -> {
             System.out.println(token);
         });
         
-        System.out.println("Result of " + source + ": " + scanner.getResult());
+        //System.out.println("Result of " + source + ": " + scanner.getResult());
+        System.out.println("Result of " + source + ": " + parser.parse());
     }
 
     static void error(int line, String message) {
