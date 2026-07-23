@@ -18,7 +18,7 @@ class Parser {
     private double term() {
         double value = factor();
         while (match(TokenType.PLUS, TokenType.MINUS)) {
-            TokenType op = previous().type;
+            TokenType op = previous().type; // since a succefull match increments the current index (goes to next token), use previous
             double right = factor();
             value = (op == TokenType.PLUS) ? value + right : value - right;
         }
@@ -28,7 +28,7 @@ class Parser {
     private double factor() {
         double value = unary();
         while (match(TokenType.STAR, TokenType.SLASH)) {
-            TokenType op = previous().type;
+            TokenType op = previous().type;  // since a succefull match increments the current index (goes to next token), use previous
             double right = unary();
             value = (op == TokenType.STAR) ? value * right : value / right;
         }
@@ -37,7 +37,7 @@ class Parser {
 
     private double unary() {
         if (match(TokenType.MINUS)) {
-            return -unary();
+            return -unary(); // a succefull MINUS match increments the current index (goes to next token), so that the recursive call to this function will not have that minus sign
         }
         return primary();
     }
@@ -47,8 +47,8 @@ class Parser {
             return (double) previous().literal;
         }
         if (match(TokenType.LEFT_PAREN)) {
-            double value = term();
-            consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
+            double value = term(); // process the expression inside the parens
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after expression."); // the token after the expression must be right paren
             return value;
         }
         throw error(peek(), "Expect expression.");
