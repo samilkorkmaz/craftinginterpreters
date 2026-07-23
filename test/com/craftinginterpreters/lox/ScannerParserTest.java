@@ -284,4 +284,22 @@ public class ScannerParserTest {
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(8.0, parser.parse(), 1e-15);
     }
+    
+    // ==========================================
+    // Multiple minus signs
+    // ==========================================
+
+    @Test
+    public void testMultipleMinus1() {
+        Scanner scanner = new Scanner("---3");
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(-3, parser.parse(), 1e-15);
+    }
+    
+    @Test
+    public void testMultipleMinus2() {
+        Scanner scanner = new Scanner("---3--4");
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(1, parser.parse(), 1e-15);
+    }
 }
