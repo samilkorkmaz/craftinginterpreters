@@ -302,7 +302,7 @@ public class ScannerParserTest {
     }
 
     // ==========================================
-    // Exponent
+    // Power
     // ==========================================
     @Test
     public void testExponentSimple() {
