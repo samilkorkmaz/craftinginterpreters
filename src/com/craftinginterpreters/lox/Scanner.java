@@ -92,6 +92,9 @@ class Scanner {
             case '*':
                 addToken(STAR);
                 break;
+            case '^':
+                addToken(CARET);
+                break;
             case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;

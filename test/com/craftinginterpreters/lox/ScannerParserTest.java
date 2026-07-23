@@ -35,7 +35,7 @@ public class ScannerParserTest {
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(3.0, parser.parse(), 1e-15);
     }
-    
+
     @Test
     public void testCalculateResult5() {
         Scanner scanner = new Scanner("8 / 2 - 1.7");
@@ -210,11 +210,10 @@ public class ScannerParserTest {
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(6, parser.parse(), 1e-15); // 3 * -2 = -6
     }
-    
+
     // ==========================================
     // Parantheses
     // ==========================================
-
     @Test
     public void testCalculateResultParens1() {
         Scanner scanner = new Scanner("(3 + 5) * 2");
@@ -284,22 +283,80 @@ public class ScannerParserTest {
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(8.0, parser.parse(), 1e-15);
     }
-    
+
     // ==========================================
     // Multiple minus signs
     // ==========================================
-
     @Test
     public void testMultipleMinus1() {
         Scanner scanner = new Scanner("---3");
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(-3, parser.parse(), 1e-15);
     }
-    
+
     @Test
     public void testMultipleMinus2() {
         Scanner scanner = new Scanner("---3--4");
         Parser parser = new Parser(scanner.getTokens());
         assertEquals(1, parser.parse(), 1e-15);
+    }
+
+    // ==========================================
+    // Exponent
+    // ==========================================
+    @Test
+    public void testExponentSimple() {
+        Scanner scanner = new Scanner("2^3");
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(8, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentRightAssociative() {
+        Scanner scanner = new Scanner("2^3^2"); // 2^(3^2) = 2^9 = 512, not (2^3)^2 = 64
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(512, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentWithUnaryBase() {
+        Scanner scanner = new Scanner("-2^2"); // -(2^2) = -4
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(-4, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentWithNegativeExponent() {
+        Scanner scanner = new Scanner("2^-2"); // 2^(-2) = 0.25
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(0.25, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentWithParens1() {
+        Scanner scanner = new Scanner("(2+1)^2"); // 3^2 = 9
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(9, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentWithParens2() {
+        Scanner scanner = new Scanner("2*3^(2*2)"); //2*3^(2*2) = 2*81 = 162
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(162, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentHigherPrecedenceThanMultiplication1() {
+        Scanner scanner = new Scanner("2*3^2"); // 2*(3^2) = 2*9 = 18, not (2*3)^2 = 36
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(18, parser.parse(), 1e-15);
+    }
+
+    @Test
+    public void testExponentHigherPrecedenceThanMultiplication2() {
+        Scanner scanner = new Scanner("2*3^2*2"); // 2*(3^2)*2 = 2*9*2 = 36, not 2*3^(2*2) = 162
+        Parser parser = new Parser(scanner.getTokens());
+        assertEquals(36, parser.parse(), 1e-15);
     }
 }

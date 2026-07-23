@@ -26,7 +26,7 @@ class Parser {
     }
 
     private double factor() {
-        double value = unary();
+        double value = unary();        
         while (match(TokenType.STAR, TokenType.SLASH)) {
             TokenType op = previous().type;  // since a succefull match increments the current index (goes to next token), use previous
             double right = unary();
@@ -34,12 +34,21 @@ class Parser {
         }
         return value;
     }
-
+    
     private double unary() {
         if (match(TokenType.MINUS)) {
             return -unary(); // a succefull MINUS match increments the current index (goes to next token), so that the recursive call to this function will not have that minus sign
         }
-        return primary();
+        return power();
+    }
+    
+    private double power() {
+        double value = primary();
+        while (match(TokenType.CARET)) {            
+            double exponent = unary(); // recurse into unary, not power → right-assoc + allows "^-2"
+            value = Math.pow(value, exponent);
+        }        
+        return value;
     }
 
     private double primary() {
