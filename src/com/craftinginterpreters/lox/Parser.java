@@ -12,10 +12,6 @@ class Parser {
     }
 
     double parse() {
-        return expression();
-    }
-
-    private double expression() {
         return term();
     }
 
@@ -51,7 +47,7 @@ class Parser {
             return (double) previous().literal;
         }
         if (match(TokenType.LEFT_PAREN)) {
-            double value = expression();
+            double value = term();
             consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
             return value;
         }
