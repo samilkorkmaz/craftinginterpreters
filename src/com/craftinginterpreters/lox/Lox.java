@@ -52,7 +52,7 @@ public class Lox {
     }
 
     private static void run(String source) {
-        Scanner scanner = new Scanner(source);        
+        Scanner scanner = new Scanner(source);
         //ArithmeticEvaluator scanner = new ArithmeticEvaluator(source);
         List<Token> tokens = scanner.getTokens();
         Parser parser = new Parser(tokens);
@@ -61,7 +61,7 @@ public class Lox {
         tokens.forEach((token) -> {
             System.out.println(token);
         });
-        
+
         //System.out.println("Result of " + source + ": " + scanner.getResult());
         System.out.println("Result of " + source + ": " + parser.parse());
     }
@@ -70,10 +70,8 @@ public class Lox {
         report(line, "", message);
     }
 
-    private static void report(int line, String where,
-            String message) {
-        System.err.println(
-                "[line " + line + "] Error" + where + ": " + message);
+    private static void report(int line, String where, String message) {
+        System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError = true;
     }
 }
