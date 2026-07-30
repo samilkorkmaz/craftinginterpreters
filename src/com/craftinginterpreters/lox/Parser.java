@@ -17,7 +17,6 @@ class Parser {
     // Associativity comes from the shape of the code, not from any flag:
     //   while (match(op)) { ... }  folds left-to-right → (a-b)-c
     //   return op(recurse());      builds right-to-left → a^(b^c)
-
     private final List<Token> tokens;
     private int current = 0;
 
@@ -81,12 +80,13 @@ class Parser {
     }
 
     private double power() {
-        double value = primary();
-        while (match(TokenType.CARET)) {
+        double value = primary();    
+        if (match(TokenType.CARET)) {
             double exponent = unary(); // unary, NOT power: gives 2^3^2 = 2^(3^2) = 512 (not 64),
-                                       // and lets the exponent be negative, as in 2^-2 = 0.25
+            // and lets the exponent be negative, as in 2^-2 = 0.25
             value = Math.pow(value, exponent);
         }
+
         return value;
     }
 
