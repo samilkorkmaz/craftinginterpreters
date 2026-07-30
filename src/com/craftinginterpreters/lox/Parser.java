@@ -83,6 +83,13 @@ class Parser {
         double value = primary();    
         if (match(TokenType.CARET)) {
             double exponent = unary(); // unary, NOT power: gives 2^3^2 = 2^(3^2) = 512 (not 64), and lets the exponent be negative, as in 2^-2 = 0.25
+            // Example 2 ^ 3 ^ 2 steps: 
+            // power#1: value = 2, sees ^
+            //          └── unary() → power#2: value = 3, sees ^
+            //                  └── unary() → power#3: value = 2, no ^  → returns 2
+            //                  value = 3^2 = 9                           → returns 9   ← computed FIRST
+            // exponent = 9
+            // value = 2^9 = 512                                                 ← computed SECOND
             // After unary() returns, every consecutive ^ has already been consumed by the recursion
             value = Math.pow(value, exponent);
         }
