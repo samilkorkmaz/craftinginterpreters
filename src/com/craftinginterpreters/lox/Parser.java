@@ -72,7 +72,7 @@ class Parser {
         return left;
     }
 
-    private double unary() {
+    private double unary() { // Unary expressions have a single operand, e.g. !a, -5
         if (match(TokenType.MINUS)) {
             return -unary(); // a succesful MINUS match increments the current index (goes to next token), so that the recursive call to this function will not have that minus sign
         }
